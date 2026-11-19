@@ -1,0 +1,217 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "user": {
+        "title": "Connect to KlipperKiosk",
+        "description": "Enter your tablet's hostname or IP address and Settings PIN (default: 1234).",
+        "data": {
+          "host": "Host or IP address",
+          "port": "Port",
+          "pin": "Settings PIN",
+          "name": "Device name"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Discovered KlipperKiosk tablet",
+        "description": "Found KlipperKiosk at {host}:{port}. Enter the tablet's Settings PIN to finish setup.",
+        "data": {
+          "pin": "Settings PIN",
+          "name": "Device name"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate KlipperKiosk",
+        "description": "The Settings PIN for {host} was rejected. Enter the updated PIN.",
+        "data": {
+          "pin": "Settings PIN"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure KlipperKiosk",
+        "description": "Update the connection details for your KlipperKiosk tablet.",
+        "data": {
+          "host": "Host or IP address",
+          "port": "Port",
+          "pin": "Settings PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to reach the KlipperKiosk tablet. Check the host, port, and network.",
+      "invalid_auth": "Invalid Settings PIN.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This KlipperKiosk tablet is already configured.",
+      "cannot_connect": "Unable to connect to the discovered device.",
+      "not_klipperkiosk": "The discovered device is not running KlipperKiosk.",
+      "reauth_successful": "PIN updated successfully.",
+      "reconfigure_successful": "Configuration updated successfully.",
+      "unique_id_mismatch": "The new host and port do not match the configured device."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "KlipperKiosk Options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "active_tab": {
+        "name": "Active tab"
+      }
+    },
+    "switch": {
+      "kiosk_locked": {
+        "name": "Hide top bar controls"
+      },
+      "lock_task_mode": {
+        "name": "Lock task mode"
+      }
+    },
+    "button": {
+      "reload": {
+        "name": "Reload active tab"
+      },
+      "reset_tabs": {
+        "name": "Reset tabs to defaults"
+      }
+    },
+    "sensor": {
+      "active_tab_url": {
+        "name": "Active tab URL"
+      },
+      "tab_count": {
+        "name": "Tab count"
+      },
+      "device_ip": {
+        "name": "Device IP"
+      }
+    },
+    "binary_sensor": {
+      "ir_emitter": {
+        "name": "IR emitter"
+      }
+    }
+  },
+  "services": {
+    "add_tab": {
+      "name": "Add tab",
+      "description": "Add a new tab to the KlipperKiosk tablet.",
+      "fields": {
+        "url": {
+          "name": "URL",
+          "description": "Target URL or .local hostname (http:// is prepended automatically if omitted)."
+        },
+        "title": {
+          "name": "Title",
+          "description": "Optional label shown in the tab strip."
+        },
+        "activate": {
+          "name": "Activate",
+          "description": "Immediately switch to the newly added tab."
+        }
+      }
+    },
+    "update_tab": {
+      "name": "Update tab",
+      "description": "Update an existing tab's title and/or URL.",
+      "fields": {
+        "tab_id": {
+          "name": "Tab ID",
+          "description": "ID of the tab to update (see the Active tab entity's tabs attribute)."
+        },
+        "title": {
+          "name": "Title",
+          "description": "New tab title."
+        },
+        "url": {
+          "name": "URL",
+          "description": "New target URL."
+        }
+      }
+    },
+    "delete_tab": {
+      "name": "Delete tab",
+      "description": "Delete a tab by ID. If active, the kiosk switches to the first remaining tab.",
+      "fields": {
+        "tab_id": {
+          "name": "Tab ID",
+          "description": "ID of the tab to delete."
+        }
+      }
+    },
+    "activate_tab": {
+      "name": "Activate tab",
+      "description": "Switch the kiosk to a specific tab by ID.",
+      "fields": {
+        "tab_id": {
+          "name": "Tab ID",
+          "description": "ID of the tab to activate."
+        }
+      }
+    },
+    "reorder_tabs": {
+      "name": "Reorder tabs",
+      "description": "Reorder the top tab strip by providing an ordered list of tab IDs.",
+      "fields": {
+        "ids": {
+          "name": "Tab IDs",
+          "description": "Ordered list of tab IDs. Any omitted existing tabs are appended at the end."
+        }
+      }
+    },
+    "navigate": {
+      "name": "Navigate",
+      "description": "Load a temporary URL in the active WebView without modifying the saved tab list.",
+      "fields": {
+        "url": {
+          "name": "URL",
+          "description": "URL to open temporarily in the active view."
+        }
+      }
+    },
+    "set_pin": {
+      "name": "Change PIN",
+      "description": "Change the Settings PIN on the tablet and update Home Assistant's stored PIN.",
+      "fields": {
+        "pin": {
+          "name": "New PIN",
+          "description": "New PIN for both the on-device Settings dialog and the Remote API."
+        }
+      }
+    },
+    "send_ir": {
+      "name": "Transmit IR signal",
+      "description": "Transmit an infrared pulse pattern (raw microseconds or Pronto Hex) via the tablet's built-in IR blaster.",
+      "fields": {
+        "frequency": {
+          "name": "Carrier frequency",
+          "description": "Carrier frequency in Hz (10000-100000) for raw patterns. Ignored when pronto_hex is used."
+        },
+        "pattern": {
+          "name": "Raw pattern (microseconds)",
+          "description": "List of alternating ON/OFF pulse durations in microseconds."
+        },
+        "pronto_hex": {
+          "name": "Pronto Hex",
+          "description": "Pronto Hex IR code string (alternative to raw pattern)."
+        },
+        "repeat": {
+          "name": "Repeat count",
+          "description": "Number of times to transmit the IR signal (1-10)."
+        },
+        "repeat_delay_ms": {
+          "name": "Repeat delay",
+          "description": "Delay in milliseconds between repeats (0-2000)."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+add_tab:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    url:
+      required: true
+      example: "http://voron.local"
+      selector:
+        text:
+    title:
+      required: false
+      example: "Voron"
+      selector:
+        text:
+    activate:
+      required: false
+      default: true
+      selector:
+        boolean:
+
+update_tab:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    tab_id:
+      required: true
+      example: "site-1"
+      selector:
+        text:
+    title:
+      required: false
+      example: "Voron 2.4"
+      selector:
+        text:
+    url:
+      required: false
+      example: "http://voron24.local"
+      selector:
+        text:
+
+delete_tab:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    tab_id:
+      required: true
+      example: "site-2"
+      selector:
+        text:
+
+activate_tab:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    tab_id:
+      required: true
+      example: "site-2"
+      selector:
+        text:
+
+reorder_tabs:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    ids:
+      required: true
+      example:
+        - "site-2"
+        - "site-1"
+      selector:
+        object:
+
+navigate:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    url:
+      required: true
+      example: "http://pi-klipper.local/console"
+      selector:
+        text:
+
+set_pin:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    pin:
+      required: true
+      example: "5678"
+      selector:
+        text:
+          type: password
+
+send_ir:
+  target:
+    device:
+      integration: klipperkiosk
+  fields:
+    frequency:
+      required: false
+      default: 38000
+      selector:
+        number:
+          min: 10000
+          max: 100000
+          step: 100
+          unit_of_measurement: Hz
+          mode: box
+    pattern:
+      required: false
+      example:
+        - 9000
+        - 4500
+        - 560
+        - 560
+        - 560
+        - 1690
+        - 560
+      selector:
+        object:
+    pronto_hex:
+      required: false
+      example: "0000 006D 0002 0000 0157 00AC 0015 0016"
+      selector:
+        text:
+          multiline: true
+    repeat:
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 10
+          step: 1
+          mode: box
+    repeat_delay_ms:
+      required: false
+      default: 100
+      selector:
+        number:
+          min: 0
+          max: 2000
+          step: 10
+          unit_of_measurement: ms
+          mode: box
+

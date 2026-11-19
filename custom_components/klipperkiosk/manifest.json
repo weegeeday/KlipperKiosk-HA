@@ -1,0 +1,19 @@
+{
+  "domain": "klipperkiosk",
+  "name": "KlipperKiosk",
+  "codeowners": ["@weegeeday"],
+  "config_flow": true,
+  "documentation": "https://github.com/weegeeday/KlipperKiosk-HA",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/weegeeday/KlipperKiosk-HA/issues",
+  "requirements": [],
+  "version": "1.0.0",
+  "zeroconf": [
+    {
+      "type": "_http._tcp.local.",
+      "name": "klipper-tablet*"
+    }
+  ]
+}
+
