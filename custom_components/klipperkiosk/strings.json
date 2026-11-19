@@ -105,6 +105,10 @@
       "name": "Add tab",
       "description": "Add a new tab to the KlipperKiosk tablet.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "url": {
           "name": "URL",
           "description": "Target URL or .local hostname (http:// is prepended automatically if omitted)."
@@ -123,6 +127,10 @@
       "name": "Update tab",
       "description": "Update an existing tab's title and/or URL.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "tab_id": {
           "name": "Tab ID",
           "description": "ID of the tab to update (see the Active tab entity's tabs attribute)."
@@ -141,6 +149,10 @@
       "name": "Delete tab",
       "description": "Delete a tab by ID. If active, the kiosk switches to the first remaining tab.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "tab_id": {
           "name": "Tab ID",
           "description": "ID of the tab to delete."
@@ -151,6 +163,10 @@
       "name": "Activate tab",
       "description": "Switch the kiosk to a specific tab by ID.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "tab_id": {
           "name": "Tab ID",
           "description": "ID of the tab to activate."
@@ -161,6 +177,10 @@
       "name": "Reorder tabs",
       "description": "Reorder the top tab strip by providing an ordered list of tab IDs.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "ids": {
           "name": "Tab IDs",
           "description": "Ordered list of tab IDs. Any omitted existing tabs are appended at the end."
@@ -171,6 +191,10 @@
       "name": "Navigate",
       "description": "Load a temporary URL in the active WebView without modifying the saved tab list.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "url": {
           "name": "URL",
           "description": "URL to open temporarily in the active view."
@@ -181,6 +205,10 @@
       "name": "Change PIN",
       "description": "Change the Settings PIN on the tablet and update Home Assistant's stored PIN.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "pin": {
           "name": "New PIN",
           "description": "New PIN for both the on-device Settings dialog and the Remote API."
@@ -191,6 +219,10 @@
       "name": "Transmit IR signal",
       "description": "Transmit an infrared pulse pattern (raw microseconds or Pronto Hex) via the tablet's built-in IR blaster.",
       "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
         "frequency": {
           "name": "Carrier frequency",
           "description": "Carrier frequency in Hz (10000-100000) for raw patterns. Ignored when pronto_hex is used."
@@ -215,4 +247,3 @@
     }
   }
 }
-

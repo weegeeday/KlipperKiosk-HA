@@ -1,8 +1,10 @@
 add_tab:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     url:
       required: true
       example: "http://voron.local"
@@ -20,10 +22,12 @@ add_tab:
         boolean:
 
 update_tab:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     tab_id:
       required: true
       example: "site-1"
@@ -41,10 +45,12 @@ update_tab:
         text:
 
 delete_tab:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     tab_id:
       required: true
       example: "site-2"
@@ -52,10 +58,12 @@ delete_tab:
         text:
 
 activate_tab:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     tab_id:
       required: true
       example: "site-2"
@@ -63,10 +71,12 @@ activate_tab:
         text:
 
 reorder_tabs:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     ids:
       required: true
       example:
@@ -76,10 +86,12 @@ reorder_tabs:
         object:
 
 navigate:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     url:
       required: true
       example: "http://pi-klipper.local/console"
@@ -87,10 +99,12 @@ navigate:
         text:
 
 set_pin:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     pin:
       required: true
       example: "5678"
@@ -99,10 +113,12 @@ set_pin:
           type: password
 
 send_ir:
-  target:
-    device:
-      integration: klipperkiosk
   fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
     frequency:
       required: false
       default: 38000
@@ -150,4 +166,3 @@ send_ir:
           step: 10
           unit_of_measurement: ms
           mode: box
-
