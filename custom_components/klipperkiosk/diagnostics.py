@@ -43,6 +43,7 @@ async def async_get_config_entry_diagnostics(
             {
                 "has_ir_emitter": ir.has_ir_emitter,
                 "carrier_frequencies": ir.carrier_frequencies,
+                "saved_commands": coordinator.ir_store.list_commands(),
             }
             if ir
             else None

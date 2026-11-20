@@ -98,6 +98,11 @@
       "ir_emitter": {
         "name": "IR emitter"
       }
+    },
+    "remote": {
+      "ir_remote": {
+        "name": "IR remote"
+      }
     }
   },
   "services": {
@@ -217,7 +222,7 @@
     },
     "send_ir": {
       "name": "Transmit IR signal",
-      "description": "Transmit an infrared pulse pattern (raw microseconds or Pronto Hex) via the tablet's built-in IR blaster.",
+      "description": "Transmit an infrared signal (raw microseconds, Pronto Hex, Broadlink Base64, or 32-bit NEC hex) via the tablet's built-in IR blaster.",
       "fields": {
         "device_id": {
           "name": "Device",
@@ -225,7 +230,7 @@
         },
         "frequency": {
           "name": "Carrier frequency",
-          "description": "Carrier frequency in Hz (10000-100000) for raw patterns. Ignored when pronto_hex is used."
+          "description": "Carrier frequency in Hz (10000-100000) for raw or Broadlink patterns."
         },
         "pattern": {
           "name": "Raw pattern (microseconds)",
@@ -233,7 +238,15 @@
         },
         "pronto_hex": {
           "name": "Pronto Hex",
-          "description": "Pronto Hex IR code string (alternative to raw pattern)."
+          "description": "Pronto Hex IR code string."
+        },
+        "broadlink_b64": {
+          "name": "Broadlink Base64",
+          "description": "Broadlink / SmartIR Base64-encoded IR packet."
+        },
+        "nec_hex": {
+          "name": "NEC hex code",
+          "description": "32-bit NEC IR hex code (e.g. 0x20DF10EF)."
         },
         "repeat": {
           "name": "Repeat count",
@@ -242,6 +255,62 @@
         "repeat_delay_ms": {
           "name": "Repeat delay",
           "description": "Delay in milliseconds between repeats (0-2000)."
+        }
+      }
+    },
+    "save_ir_command": {
+      "name": "Save IR command",
+      "description": "Save a named IR command so it can be sent via remote.send_command.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
+        "ir_device": {
+          "name": "IR device group",
+          "description": "Optional logical device name (e.g. tv, fan, ac). Defaults to 'default'."
+        },
+        "command": {
+          "name": "Command name",
+          "description": "Name of the IR command (e.g. power, volume_up)."
+        },
+        "frequency": {
+          "name": "Carrier frequency",
+          "description": "Carrier frequency in Hz (10000-100000) for raw or Broadlink patterns."
+        },
+        "pattern": {
+          "name": "Raw pattern (microseconds)",
+          "description": "List of alternating ON/OFF pulse durations in microseconds."
+        },
+        "pronto_hex": {
+          "name": "Pronto Hex",
+          "description": "Pronto Hex IR code string."
+        },
+        "broadlink_b64": {
+          "name": "Broadlink Base64",
+          "description": "Broadlink / SmartIR Base64-encoded IR packet."
+        },
+        "nec_hex": {
+          "name": "NEC hex code",
+          "description": "32-bit NEC IR hex code (e.g. 0x20DF10EF)."
+        }
+      }
+    },
+    "delete_ir_command": {
+      "name": "Delete IR command",
+      "description": "Delete a saved named IR command.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "Target KlipperKiosk tablet (optional if only one is configured)."
+        },
+        "ir_device": {
+          "name": "IR device group",
+          "description": "Optional logical device name the command was saved under."
+        },
+        "command": {
+          "name": "Command name",
+          "description": "Name of the saved IR command to delete."
         }
       }
     }

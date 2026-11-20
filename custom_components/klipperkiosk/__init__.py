@@ -29,8 +29,12 @@ from homeassistant.helpers.typing import ConfigType
 from .api import KlipperKioskApiClient, KlipperKioskError
 from .const import (
     ATTR_ACTIVATE,
+    ATTR_BROADLINK_B64,
+    ATTR_COMMAND,
     ATTR_FREQUENCY,
     ATTR_IDS,
+    ATTR_IR_DEVICE,
+    ATTR_NEC_HEX,
     ATTR_PATTERN,
     ATTR_PIN,
     ATTR_PRONTO_HEX,
@@ -43,20 +47,25 @@ from .const import (
     DOMAIN,
     SERVICE_ACTIVATE_TAB,
     SERVICE_ADD_TAB,
+    SERVICE_DELETE_IR_COMMAND,
     SERVICE_DELETE_TAB,
     SERVICE_NAVIGATE,
     SERVICE_REORDER_TABS,
+    SERVICE_SAVE_IR_COMMAND,
     SERVICE_SEND_IR,
     SERVICE_SET_PIN,
     SERVICE_UPDATE_TAB,
 )
 from .coordinator import KlipperKioskConfigEntry, KlipperKioskCoordinator
+from .ir import IrFormatError, build_ir_payload
+from .ir_store import KlipperKioskIrStore
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.REMOTE,
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
@@ -126,12 +135,39 @@ SERVICE_SEND_IR_SCHEMA = vol.Schema(
             vol.Coerce(int), vol.Range(min=10000, max=100000)
         ),
         vol.Optional(ATTR_PRONTO_HEX): cv.string,
+        vol.Optional(ATTR_BROADLINK_B64): cv.string,
+        vol.Optional(ATTR_NEC_HEX): cv.string,
         vol.Optional(ATTR_REPEAT, default=1): vol.All(
             vol.Coerce(int), vol.Range(min=1, max=10)
         ),
         vol.Optional(ATTR_REPEAT_DELAY_MS, default=100): vol.All(
             vol.Coerce(int), vol.Range(min=0, max=2000)
         ),
+    },
+    extra=vol.ALLOW_EXTRA,
+)
+
+SERVICE_SAVE_IR_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_COMMAND): cv.string,
+        vol.Optional(ATTR_IR_DEVICE): cv.string,
+        vol.Optional(ATTR_PATTERN): vol.All(
+            cv.ensure_list, [vol.All(vol.Coerce(int), vol.Range(min=1))]
+        ),
+        vol.Optional(ATTR_FREQUENCY, default=38000): vol.All(
+            vol.Coerce(int), vol.Range(min=10000, max=100000)
+        ),
+        vol.Optional(ATTR_PRONTO_HEX): cv.string,
+        vol.Optional(ATTR_BROADLINK_B64): cv.string,
+        vol.Optional(ATTR_NEC_HEX): cv.string,
+    },
+    extra=vol.ALLOW_EXTRA,
+)
+
+SERVICE_DELETE_IR_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_COMMAND): cv.string,
+        vol.Optional(ATTR_IR_DEVICE): cv.string,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -284,24 +320,68 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             )
 
     async def handle_send_ir(call: ServiceCall) -> None:
-        pattern = call.data.get(ATTR_PATTERN)
-        pronto_hex = call.data.get(ATTR_PRONTO_HEX)
-        if not pattern and not pronto_hex:
-            raise ServiceValidationError(
-                "Either 'pattern' (microseconds list) or 'pronto_hex' must be provided."
+        try:
+            payload = build_ir_payload(
+                pattern=call.data.get(ATTR_PATTERN),
+                frequency=call.data[ATTR_FREQUENCY],
+                pronto_hex=call.data.get(ATTR_PRONTO_HEX),
+                broadlink_b64=call.data.get(ATTR_BROADLINK_B64),
+                nec_hex=call.data.get(ATTR_NEC_HEX),
             )
+        except IrFormatError as err:
+            raise ServiceValidationError(str(err)) from err
+
         for entry in _resolve_target_entries(hass, call):
             coordinator = entry.runtime_data
             try:
                 await coordinator.client.async_transmit_ir(
-                    pattern=pattern,
-                    frequency=call.data[ATTR_FREQUENCY],
-                    pronto_hex=pronto_hex,
+                    pattern=payload.pattern,
+                    frequency=payload.frequency,
+                    pronto_hex=payload.pronto_hex,
                     repeat=call.data[ATTR_REPEAT],
                     repeat_delay_ms=call.data[ATTR_REPEAT_DELAY_MS],
                 )
             except KlipperKioskError as err:
                 raise HomeAssistantError(f"Failed to transmit IR signal: {err}") from err
+
+    async def handle_save_ir_command(call: ServiceCall) -> None:
+        command_name = call.data[ATTR_COMMAND].strip()
+        if not command_name:
+            raise ServiceValidationError("Command name cannot be empty.")
+        try:
+            payload = build_ir_payload(
+                pattern=call.data.get(ATTR_PATTERN),
+                frequency=call.data[ATTR_FREQUENCY],
+                pronto_hex=call.data.get(ATTR_PRONTO_HEX),
+                broadlink_b64=call.data.get(ATTR_BROADLINK_B64),
+                nec_hex=call.data.get(ATTR_NEC_HEX),
+            )
+        except IrFormatError as err:
+            raise ServiceValidationError(str(err)) from err
+
+        ir_device = call.data.get(ATTR_IR_DEVICE)
+        for entry in _resolve_target_entries(hass, call):
+            coordinator = entry.runtime_data
+            await coordinator.ir_store.async_save_command(
+                command_name, payload, device=ir_device
+            )
+            coordinator.async_update_listeners()
+
+    async def handle_delete_ir_command(call: ServiceCall) -> None:
+        command_name = call.data[ATTR_COMMAND].strip()
+        ir_device = call.data.get(ATTR_IR_DEVICE)
+        removed_any = False
+        for entry in _resolve_target_entries(hass, call):
+            coordinator = entry.runtime_data
+            if await coordinator.ir_store.async_delete_command(
+                command_name, device=ir_device
+            ):
+                removed_any = True
+                coordinator.async_update_listeners()
+        if not removed_any:
+            raise ServiceValidationError(
+                f"Saved IR command '{command_name}' was not found."
+            )
 
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_TAB, handle_add_tab, schema=SERVICE_ADD_TAB_SCHEMA
@@ -333,6 +413,18 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.services.async_register(
         DOMAIN, SERVICE_SEND_IR, handle_send_ir, schema=SERVICE_SEND_IR_SCHEMA
     )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SAVE_IR_COMMAND,
+        handle_save_ir_command,
+        schema=SERVICE_SAVE_IR_COMMAND_SCHEMA,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_DELETE_IR_COMMAND,
+        handle_delete_ir_command,
+        schema=SERVICE_DELETE_IR_COMMAND_SCHEMA,
+    )
 
     return True
 
@@ -348,7 +440,10 @@ async def async_setup_entry(
         port=entry.data[CONF_PORT],
         pin=entry.data[CONF_PIN],
     )
-    coordinator = KlipperKioskCoordinator(hass, entry, client)
+    ir_store = KlipperKioskIrStore(hass, entry.entry_id)
+    await ir_store.async_load()
+
+    coordinator = KlipperKioskCoordinator(hass, entry, client, ir_store)
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator
@@ -370,4 +465,3 @@ async def async_unload_entry(
 ) -> bool:
     """Unload a KlipperKiosk config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-

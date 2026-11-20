@@ -147,6 +147,17 @@ send_ir:
       selector:
         text:
           multiline: true
+    broadlink_b64:
+      required: false
+      example: "JgBQAAAB..."
+      selector:
+        text:
+          multiline: true
+    nec_hex:
+      required: false
+      example: "0x20DF10EF"
+      selector:
+        text:
     repeat:
       required: false
       default: 1
@@ -166,3 +177,75 @@ send_ir:
           step: 10
           unit_of_measurement: ms
           mode: box
+
+save_ir_command:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
+    ir_device:
+      required: false
+      example: "tv"
+      selector:
+        text:
+    command:
+      required: true
+      example: "power"
+      selector:
+        text:
+    frequency:
+      required: false
+      default: 38000
+      selector:
+        number:
+          min: 10000
+          max: 100000
+          step: 100
+          unit_of_measurement: Hz
+          mode: box
+    pattern:
+      required: false
+      example:
+        - 9000
+        - 4500
+        - 560
+        - 560
+      selector:
+        object:
+    pronto_hex:
+      required: false
+      example: "0000 006D 0002 0000 0157 00AC 0015 0016"
+      selector:
+        text:
+          multiline: true
+    broadlink_b64:
+      required: false
+      example: "JgBQAAAB..."
+      selector:
+        text:
+          multiline: true
+    nec_hex:
+      required: false
+      example: "0x20DF10EF"
+      selector:
+        text:
+
+delete_ir_command:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: klipperkiosk
+    ir_device:
+      required: false
+      example: "tv"
+      selector:
+        text:
+    command:
+      required: true
+      example: "power"
+      selector:
+        text:

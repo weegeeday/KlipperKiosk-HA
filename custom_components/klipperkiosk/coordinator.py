@@ -20,6 +20,7 @@ from .api import (
     KlipperKioskError,
 )
 from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .ir_store import KlipperKioskIrStore
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,8 +45,10 @@ class KlipperKioskCoordinator(DataUpdateCoordinator[KlipperKioskData]):
         hass: HomeAssistant,
         config_entry: KlipperKioskConfigEntry,
         client: KlipperKioskApiClient,
+        ir_store: KlipperKioskIrStore,
     ) -> None:
         self.client = client
+        self.ir_store = ir_store
         self._ir_capabilities: IrCapabilities | None = None
         self._ir_checked = False
 
@@ -78,4 +81,3 @@ class KlipperKioskCoordinator(DataUpdateCoordinator[KlipperKioskData]):
             ) from err
         except KlipperKioskError as err:
             raise UpdateFailed(f"Error communicating with KlipperKiosk: {err}") from err
-
