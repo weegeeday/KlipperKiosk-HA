@@ -2,7 +2,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-Home Assistant custom integration (HACS-compatible) to monitor and control a **KlipperKiosk** Android tablet over its local Remote Management REST API (`http://klipper-tablet.local:8765`).
+Home Assistant custom integration (HACS-compatible) to monitor and control a [**KlipperKiosk**](https://github.com/weegeeday/KlipperKiosk) Android tablet over its local Remote Management REST API (`http://klipper-tablet.local:8765`).
 
 ## Features
 
